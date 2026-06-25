@@ -6,7 +6,7 @@
     'error'            => null,
 ])
 
-<div class="relative" x-data>
+<div class="relative">
     <label class="label">Pilih User <span class="text-red-400">*</span></label>
 
     @if ($selectedUser)
@@ -45,7 +45,7 @@
             />
         </div>
 
-        {{-- Dropdown results --}}
+        {{-- Dropdown results - rendered by Livewire state directly --}}
         @if ($showUserDropdown)
             <div class="absolute z-50 mt-1 w-full bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
                 @if (count($userResults) > 0)

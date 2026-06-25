@@ -81,8 +81,7 @@ class HealthCheckEdit extends Component
     {
         if (strlen($this->userSearch) < 1) return collect();
 
-        return User::where('role', 'user')
-            ->where(function ($q) {
+        return User::where(function ($q) {
                 $q->where('name', 'like', "%{$this->userSearch}%")
                   ->orWhere('employee_id', 'like', "%{$this->userSearch}%")
                   ->orWhere('department', 'like', "%{$this->userSearch}%");
