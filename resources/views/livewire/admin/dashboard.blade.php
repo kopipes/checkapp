@@ -97,16 +97,41 @@
             </div>
             <div class="divide-y divide-gray-50">
                 @forelse ($recentChecks as $check)
-                    <div class="px-5 py-3.5 flex items-center gap-3 hover:bg-slate-50/60 transition-colors">
-                        <div class="h-8 w-8 rounded-xl flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                    <div class="px-5 py-3.5 flex items-start gap-3 hover:bg-slate-50/60 transition-colors">
+                        <div class="h-8 w-8 rounded-xl flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5"
                              style="background: linear-gradient(135deg, #0f2044, #162d58);">
                             {{ strtoupper(substr($check->user->name, 0, 2)) }}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-gray-800 truncate">{{ $check->user->name }}</p>
-                            <p class="text-xs text-gray-400">{{ $check->check_date->format('d M Y') }}</p>
+                            <div class="flex items-center justify-between gap-2 mb-1">
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-800 truncate">{{ $check->user->name }}</p>
+                                    <p class="text-xs text-gray-400">{{ $check->check_date->format('d M Y') }}</p>
+                                </div>
+                                <x-status-badge :status="$check->overall_status" />
+                            </div>
+                            {{-- Measurement results --}}
+                            @php
+                                $measurements = [];
+                                if ($check->fasting_blood_sugar) $measurements[] = ['label' => 'GDP', 'value' => $check->fasting_blood_sugar, 'high' => $check->fasting_blood_sugar_status === 'high'];
+                                if ($check->random_blood_sugar)  $measurements[] = ['label' => 'GDS', 'value' => $check->random_blood_sugar,  'high' => $check->random_blood_sugar_status === 'high'];
+                                if ($check->uric_acid)           $measurements[] = ['label' => 'AU',  'value' => $check->uric_acid,            'high' => $check->uric_acid_status === 'high'];
+                                if ($check->cholesterol)         $measurements[] = ['label' => 'Kol', 'value' => $check->cholesterol,          'high' => $check->cholesterol_status === 'high'];
+                                if ($check->systolic && $check->diastolic) $measurements[] = ['label' => 'Tensi', 'value' => $check->systolic.'/'.$check->diastolic, 'high' => !in_array($check->blood_pressure_status, ['optimal','normal','unmeasured'])];
+                            @endphp
+                            @if (count($measurements))
+                                <div class="flex flex-wrap items-center gap-y-1 mt-2">
+                                    @foreach ($measurements as $i => $m)
+                                        <span class="text-xs px-2 {{ $m['high'] ? 'text-red-500 font-semibold' : 'text-gray-500' }}">
+                                            {{ $m['label'] }}: {{ $m['value'] }}
+                                        </span>
+                                        @if (!$loop->last)
+                                            <span class="text-gray-200 text-xs">|</span>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
-                        <x-status-badge :status="$check->overall_status" />
                     </div>
                 @empty
                     <div class="px-5 py-10 text-center">

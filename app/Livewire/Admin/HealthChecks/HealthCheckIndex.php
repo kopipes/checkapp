@@ -27,11 +27,42 @@ class HealthCheckIndex extends Component
     #[Url]
     public string $status = '';
 
+    public ?int $confirmingDeleteId = null;
+    public string $confirmingDeleteName = '';
+
     public function updatedSearch(): void     { $this->resetPage(); }
     public function updatedDateFrom(): void   { $this->resetPage(); }
     public function updatedDateTo(): void     { $this->resetPage(); }
     public function updatedDepartment(): void { $this->resetPage(); }
     public function updatedStatus(): void     { $this->resetPage(); }
+
+    public function confirmDelete(int $id): void
+    {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
+        $check = HealthCheck::with('user')->findOrFail($id);
+        $this->confirmingDeleteId   = $id;
+        $this->confirmingDeleteName = $check->user->name . ' — ' . $check->check_date->format('d M Y');
+    }
+
+    public function cancelDelete(): void
+    {
+        $this->confirmingDeleteId   = null;
+        $this->confirmingDeleteName = '';
+    }
+
+    public function delete(): void
+    {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
+        if ($this->confirmingDeleteId) {
+            HealthCheck::findOrFail($this->confirmingDeleteId)->delete();
+            session()->flash('message', 'Data pemeriksaan berhasil dihapus.');
+        }
+
+        $this->confirmingDeleteId   = null;
+        $this->confirmingDeleteName = '';
+    }
 
     public function render()
     {

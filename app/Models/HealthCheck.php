@@ -32,10 +32,10 @@ class HealthCheck extends Model
     {
         return [
             'check_date'           => 'date',
-            'fasting_blood_sugar'  => 'decimal:2',
-            'random_blood_sugar'   => 'decimal:2',
-            'uric_acid'            => 'decimal:2',
-            'cholesterol'          => 'decimal:2',
+            'fasting_blood_sugar'  => 'float',
+            'random_blood_sugar'   => 'float',
+            'uric_acid'            => 'float',
+            'cholesterol'          => 'float',
         ];
     }
 
